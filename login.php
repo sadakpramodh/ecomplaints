@@ -75,11 +75,23 @@ if(isset($_POST["login"]))
 				echo "<div class=\"form-group\">";
             	echo "<div class=\"alert alert-success alert-dismissible\" role=\"alert\">";
   				echo "<button type=\"button\" class=\"close\" data-dismiss=\"alert\" aria-label=\"Close\"><span aria-hidden=\"true\">&times;</span></button>";
-  				echo "<strong>Sucessfully</strong> Logged out!";
+  				echo "<strong>{$_SESSION["logout_message"]}</strong>";
 				echo "</div>";
             
             	echo "</div>";
 				$_SESSION["logout_message"] = null;
+				}
+				
+			if($_SESSION["warning_message"] != null)
+				{
+				echo "<div class=\"form-group\">";
+            	echo "<div class=\"alert alert-warning alert-dismissible\" role=\"alert\">";
+  				echo "<button type=\"button\" class=\"close\" data-dismiss=\"alert\" aria-label=\"Close\"><span aria-hidden=\"true\">&times;</span></button>";
+  				echo "Please Login!";
+				echo "</div>";
+            
+            	echo "</div>";
+				$_SESSION["warning_message"] = null;
 				}
 			?>
 			<div class="form-group">

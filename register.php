@@ -50,7 +50,7 @@ if(isset($_POST["register"]))
 			{
 				$add_user = add_user_db($username, $password, $email);
 				//add query result
-				if($add_user = true)
+				if($add_user == true)
 					{
 						$_SESSION["registration_message"] = "Registration sucessfully done! Please login !";
 					}

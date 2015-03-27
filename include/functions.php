@@ -48,7 +48,7 @@ function footer()
 	
 	return $output;
 	}
-function navigation()
+function navigation($block,$aadhar,$username,$deptid)
 	{
 	global $sitename;
 	
@@ -61,16 +61,25 @@ function navigation()
 	$output .= "<span class=\"icon-bar\"></span>";
 	$output .= "<span class=\"icon-bar\"></span>";
 	$output .= "</button>";
-	$output .= "<a class=\"navbar-brand\" href=\"#\">". $_SESSION["sitename"] ."</a></div>";
+	$output .= "<a class=\"navbar-brand\" href=\"index.php\">". $_SESSION["sitename"] ."</a></div>";
 	$output .= "<div id=\"navbar\" class=\"navbar-collapse collapse\">";
 	$output .= "<ul class=\"nav navbar-nav navbar-right\">";
-	$output .= "<li><a href=\"#\">Dashboard</a></li>";
-	$output .= "<li><a href=\"#\">Post Complaint</a></li>";
-	$output .= "<li><a href=\"#\">View Complaints</a></li>";
-	$output .= "<li><a href=\"#\">Profile</a></li>";
-	$output .= "<li><a href=\"#\">Contact</a></li>";
-	$output .= "<li><a href=\"#\">Help</a></li>";
-	$output .= "<li><a href=\"logout.php\">Logout</a></li>";
+	$output .= "<li><a href=\"dashboard.php\">Dashboard</a></li>";
+	if($aadhar != "0" && $username !=null && $_SESSION["username"] != null)
+	{
+	$output .=  "<li><a href=\"postcomplaint.php\">Post Complaint</a></li>";
+	$output .=  "<li><a href=\"viewcomplaint.php\">View Complaints</a></li>";
+	}
+	if($username !=null || $_SESSION["username"] != null)
+	{
+	$output .= "<li><a href=\"profile.php\">Profile</a></li>";
+	}
+	$output .= "<li><a href=\"contact.php\">Contact</a></li>";
+	$output .= "<li><a href=\"help.php\">Help</a></li>";
+	if($username !=null || $_SESSION["username"] != null)
+	{
+	$output .=   "<li><a href=\"logout.php\">Logout</a></li>";
+	}
 	$output .= "</ul>";
 	$output .= "<form class=\"navbar-form navbar-right\">";
 	$output .= "<input type=\"text\" class=\"form-control\" placeholder=\"Search...\">";
@@ -81,26 +90,35 @@ function navigation()
    
    return $output;
 	}
-function sidebar()
+function sidebar($block,$aadhar,$username,$deptid)
 	{
 	
 	$output = "<div class=\"container-fluid\">";
 	$output .= "<div class=\"row\">";
 	$output .=  "<div class=\"col-sm-3 col-md-2 sidebar\">";
 	$output .=  "<ul class=\"nav nav-sidebar\">";
-	$output .= "<li class=\"active\"><a href=\"#\">Overview <span class=\"sr-only\">(current)</span></a></li>";
+	$output .= "<li class=\"active\"><a href=\"dashboard.php\">Overview <span class=\"sr-only\">(current)</span></a></li>";
 	$output .= "</ul>";
 	
 	$output .=  "<ul class=\"nav nav-sidebar\">";
-	$output .=  "<li><a href=\"\">Post Complaint</a></li>";
-	$output .=  "<li><a href=\"\">View Complaints</a></li>";
-	$output .=  "<li><a href=\"\">Profile</a></li>";
+	if($aadhar != "0" && $username !=null && $_SESSION["username"] != null)
+	{
+	$output .=  "<li><a href=\"postcomplaint.php\">Post Complaint</a></li>";
+	$output .=  "<li><a href=\"viewcomplaint.php\">View Complaints</a></li>";
+	}
+	if($username !=null || $_SESSION["username"] != null)
+	{
+	$output .=  "<li><a href=\"profile.php\">Profile</a></li>";
+	}
+	if($username !=null || $_SESSION["username"] != null)
+	{
 	$output .=   "<li><a href=\"logout.php\">Logout</a></li>";
+	}
 	$output .=  "</ul>";
 	
 	$output .=  "<ul class=\"nav nav-sidebar\">";
-	$output .=  "<li><a href=\"\">Contact</a></li>";
-	$output .=   "<li><a href=\"\">Help</a></li>";
+	$output .=  "<li><a href=\"contact.php\">Contact</a></li>";
+	$output .=   "<li><a href=\"help.php\">Help</a></li>";
 	$output .=   "</ul>";
 	
 	$output .=   "</div>";
@@ -256,6 +274,83 @@ function getsiteconfiguration()
 		mysqli_free_result($result);
 		
 		databaseconnectivity_close();
+	}
+	
+function set_user_details_variables()
+	{
+		$q = fetch_data(aadhar, $ref_column, $ref_value, $table_name);
+	if($q!=null)
+		{
+			global $aadhar;
+			$aadhar = $q;
+		}
+	else
+		{
+			echo "failed fetch aadhar details";
+		}
+		
+	$q = fetch_data(status, $ref_column, $ref_value, $table_name);
+	if($q!=null)
+		{
+			global $status;
+			$status = $q;
+		}
+	else
+		{
+			echo "failed fetch status details";
+		}
+	$q = fetch_data(verificationkey, $ref_column, $ref_value, $table_name);
+	if($q!=null)
+		{
+			global $verificationkey;
+			$verificationkey = $q;
+		}
+	else
+		{
+			echo "failed fetch verification key details";
+		}
+	$q = fetch_data(block, $ref_column, $ref_value, $table_name);
+	if($q!=null)
+		{
+			global $block;
+			$block = $q;
+		}
+	else
+		{
+			echo "failed fetch block details";
+		}
+	$q = fetch_data(address, $ref_column, $ref_value, $table_name);
+	if($q!=null)
+		{
+			global $address;
+			$address = $q;
+		}
+	else
+		{
+			echo "failed fetch address details";
+		}
+		
+	$q = fetch_data(phno, $ref_column, $ref_value, $table_name);
+	if($q!=null)
+		{
+			global $phno;
+			$phno = $q;
+		}
+	else
+		{
+			echo "failed fetch phone number details";
+		}
+	$q = fetch_data(gender, $ref_column, $ref_value, $table_name);
+	if($q!=null)
+		{
+			global $gender;
+			$gender = $q;
+		}
+	else
+		{
+			echo "failed fetch gender details";
+		}
+		
 	}
 function perform_login($username, $password)
 	{
@@ -563,11 +658,37 @@ function fetch_data($need_column, $ref_column, $ref_value, $table_name)
 		
 		return $needed_value;
 	}
-function update_field($need_column, $ref_column, $ref_value, $table_name)
+function update_field($update_column,$update_value, $ref_column, $ref_value, $table_name)
 	{
+		$update_result = false;
 		databaseconnectivity_open();
 		global $connection;
-		$field = mysqli_real_escape_string($connection, $ref_value);
+		$ref_value = mysqli_real_escape_string($connection, $ref_value);
+		$update_value = mysqli_real_escape_string($connection, $update_value);
+		$query = "UPDATE `".$table_name."` SET `".$update_column."`=".$update_value." WHERE `".$ref_column."` = \"".$ref_value."\" LIMIT 1";
+		echo $query;
+		$result = mysqli_query($connection, $query);
+		/*
+		if($result && mysqli_affected_rows($connection) == 1)
+			{
+				$update_result = true;
+			}
+		else
+			{
+			$_SESSION["error_number"] = "2008";
+			$_SESSION["error_message"] = "Query failed while updating ".$update_column." from ".$table_name."!";
+			
+			$string = "error.php?error_number=";
+			$string .= urlencode("DB_Query_Failed");
+			$string .= "&error_message=";
+			$string .= urlencode("Query failed while updating ".$update_column." from ".$table_name."!");
+			
+			redirect_to($string);
+			}
+			
+		mysqli_free_result($result);
 		
+		databaseconnectivity_close();
 		
+		return $update_result;*/
 	}
