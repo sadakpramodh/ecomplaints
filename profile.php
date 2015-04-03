@@ -22,43 +22,6 @@ session_start();
 	$type = $_SESSION["type"];
 	$deptid = $_SESSION["deptid"];
 	
-	if(isset($_POST["verificationkey"]))
-		{
-			$verificationkey = $_POST["verificationkey"];
-			$q = fetch_data(verificationkey, $ref_column, $ref_value, $table_name);
-			if($q!=null)
-				{
-				$verificationkey_db = $q;
-				if($verificationkey_db == $verificationkey)
-					{
-						$update_result = update_field(verificationkey, 0, username, $username, $table_name);
-						if($update_result == true)
-							{
-								$update_result = update_field(status, 1, username, $username, $table_name);
-								if($update_result == true)
-									{
-										echo "Email is sucessfully validated!";
-									}
-								else
-									{
-										echo "Failed to set status";
-									}
-							}
-						else
-							{
-								echo "failed to set verification key";
-							}
-					}
-				else
-					{
-						echo "Invalid verification key!";
-					}
-				}
-			else
-				{
-				echo "failed fetch verification key details";
-				}
-		}
 		
 if(isset($_POST["update"]))
 	{
@@ -67,13 +30,51 @@ if(isset($_POST["update"]))
 		$phno = $_POST["phno"];
 		$gender = $_POST["gender"];
 		$errors = array();
-		if(!isset($aadhar[12]) || isset($name[14]))
+		if(!isset($aadhar[11]) || isset($aadhar[14]))
 			{
     		$errors["aadhar"] = "Invalid aadhar format!";
 			}
+		if(!isset($phno[6]) || isset($phno[15]))
+			{
+    		$errors["phno"] = "Invalid phone number!";
+			}
+		if(!isset($address[10]) || isset($address[35]))
+			{
+    		$errors["address"] = "Invalid address!";
+			}
 		if(empty($errors))
 			{
-				$res = update_field(aadhar,$aadhar, username, $username, users);
+				databaseconnectivity_open();
+				global $connection;
+				$aadhar = mysqli_real_escape_string($connection, $aadhar);
+				$address = mysqli_real_escape_string($connection, $address);
+				$phno = mysqli_real_escape_string($connection, $phno);
+				$gender = mysqli_real_escape_string($connection, $gender);
+				
+				$query = "UPDATE `users` SET `aadhar`=\"".$aadhar."\",`address`=\"".$address."\", `phno`=\"".$phno."\", `gender`=\"".$gender."\" WHERE `username` = \"".$username."\" LIMIT 1";
+				
+				$result = mysqli_query($connection, $query);
+				if($result)
+			{
+				$update_result = true;
+			}
+		else
+			{
+			$_SESSION["error_number"] = "2008";
+			$_SESSION["error_message"] = "Query failed while updating userdetails from users!";
+			
+			$string = "error.php?error_number=";
+			$string .= urlencode("DB_Query_Failed");
+			$string .= "&error_message=";
+			$string .= urlencode("Query failed while updating userdetails from users!");
+			
+			redirect_to($string);
+			}
+			
+		mysqli_free_result($result);
+		
+		databaseconnectivity_close();
+				/*$res = update_field(aadhar,$aadhar, username, $username, users);
 				if($res == true)
 					{
 						$update_res["aadhar"] = "Aadhar is updated !";
@@ -112,7 +113,9 @@ if(isset($_POST["update"]))
 					{
 						$update_res["gender"] = "Gender updation failed !";
 					}
-				}
+					
+					
+				}*/
 			}
 	}
 echo header_page();
@@ -188,8 +191,8 @@ echo header_page();
 		
 		
 //sidebar and navigation bar
-echo navigation($block, $aadhar, $username, $deptid);
-echo sidebar($block, $aadhar, $username, $deptid);
+echo navigation($block, $aadhar, $username, $deptid, $status, $verificationkey);
+echo sidebar($block, $aadhar, $username, $deptid, $status, $verificationkey);
 echo "<div class=\"col-sm-9 col-sm-offset-3 col-md-10 col-md-offset-2 main\">";
 
 		
@@ -233,17 +236,36 @@ echo "<div class=\"col-sm-9 col-sm-offset-3 col-md-10 col-md-offset-2 main\">";
 			
 
 
-
-
-
-
-
-
 	if($block == "1")
 		{
-			$error_mesasge = "Admin is blocked please contact us in contact areas about your problem!";
-			echo $error_mesasge;
-			die("Admin is blocked please contact us in contact areas about your problem!");
+			$error_message = "Admin is blocked you please contact us in contact areas about your problem!";
+			echo"<div class=\"col-lg-8\">";
+			echo"<div class=\"panel panel-danger\">";
+            echo"<div class=\"panel-heading\">";
+            echo"You are blocked";
+            echo"</div>";
+            echo"<div class=\"panel-body\">";
+            echo"<p>{$error_message}</p>";
+            echo"</div>";
+            echo"<div class=\"panel-footer\">";
+            echo"<a href=\"contact.php\">Contact Admin</a>";            
+            echo"</div>";
+            echo"</div>";
+			echo"</div>";
+			
+			
+		}
+	else
+		{
+			if($status == "0" && $verificationkey != "0")
+				{
+					redirect_to("validateemail.php");
+				}
+				
+			else
+				{
+					//display profile form
+				}
 		}
 	
 ?>
@@ -310,9 +332,11 @@ echo "<div class=\"col-sm-9 col-sm-offset-3 col-md-10 col-md-offset-2 main\">";
                      <div class="control-group">
                         <label for="gender" class ="control-label">Gender</label>
                        		<div class="controls">
-                            <input type="radio" name="gender" value="male" selected="<?php if($gender == "male"){ echo "selected"; }?>"/>Male
+                            <input type="radio" name="gender" value="male" <?php if($gender == "male"){ echo "checked=\"checked\""; } else { echo "unchecked"; } ?>/>Male
                             &nbsp;&nbsp;
-                            <input type="radio" name="gender" value="female" selected="<?php if($gender == "female"){ echo "selected"; }?>"/>Female
+                            <input type="radio" name="gender" value="female" <?php if($gender == "female"){ echo "checked=\"checked\""; } else { echo "unchecked"; } ?>/>Female
+                            &nbsp;&nbsp;
+                            <input type="radio" name="gender" value="0" <?php if($gender == "0"){ echo "checked=\"checked\""; }else { echo "unchecked"; }?>/>Prefered Not to Say
                           
                      		</div>
                       </div>

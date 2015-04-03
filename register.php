@@ -6,6 +6,12 @@ error_reporting_mode();
 getsiteconfiguration();
 echo header_page();
 
+if($_SESSION["username"] != null || $_SESSION["userid"] != null || $_SESSION["email"] != null)
+		{
+			$_SESSION["warning_message"] = "First Logout then register for another account.";
+			redirect_to("dashboard.php");
+			
+		}
 
 if(isset($_POST["register"]))
 	{

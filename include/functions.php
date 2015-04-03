@@ -16,6 +16,7 @@ function header_page()
 
     $output .="<!-- Bootstrap core CSS -->";
     $output .="<link href=\"css/ecomplaints.min.css\" rel=\"stylesheet\">";
+	$output .="<link href=\"css/font-awesome.min.css\" rel=\"stylesheet\">";
 
     $output .="<!-- Custom styles for this template -->";
     $output .="<link href=\"css/ecomplaints-main.css\" rel=\"stylesheet\">";
@@ -48,7 +49,7 @@ function footer()
 	
 	return $output;
 	}
-function navigation($block,$aadhar,$username,$deptid)
+function navigation($block,$aadhar,$username,$deptid,$status,$verificationkey)
 	{
 	global $sitename;
 	
@@ -64,11 +65,16 @@ function navigation($block,$aadhar,$username,$deptid)
 	$output .= "<a class=\"navbar-brand\" href=\"index.php\">". $_SESSION["sitename"] ."</a></div>";
 	$output .= "<div id=\"navbar\" class=\"navbar-collapse collapse\">";
 	$output .= "<ul class=\"nav navbar-nav navbar-right\">";
+	$output .= "<li><a href=\"index.php\">Home</a></li>";
+	
+	if($aadhar != "0" && $username !=null && $_SESSION["username"] != null && $status !=0 && $verificationkey == "0")
+	{
 	$output .= "<li><a href=\"dashboard.php\">Dashboard</a></li>";
-	if($aadhar != "0" && $username !=null && $_SESSION["username"] != null)
+	if($block != 1)
 	{
 	$output .=  "<li><a href=\"postcomplaint.php\">Post Complaint</a></li>";
 	$output .=  "<li><a href=\"viewcomplaint.php\">View Complaints</a></li>";
+	}
 	}
 	if($username !=null || $_SESSION["username"] != null)
 	{
@@ -90,21 +96,27 @@ function navigation($block,$aadhar,$username,$deptid)
    
    return $output;
 	}
-function sidebar($block,$aadhar,$username,$deptid)
+function sidebar($block,$aadhar,$username,$deptid,$status,$verificationkey)
 	{
 	
 	$output = "<div class=\"container-fluid\">";
 	$output .= "<div class=\"row\">";
 	$output .=  "<div class=\"col-sm-3 col-md-2 sidebar\">";
 	$output .=  "<ul class=\"nav nav-sidebar\">";
-	$output .= "<li class=\"active\"><a href=\"dashboard.php\">Overview <span class=\"sr-only\">(current)</span></a></li>";
+	//class=\"active\" in li to active
+	
+	if($aadhar != "0" && $username !=null && $_SESSION["username"] != null && $status !=0 && $verificationkey == "0")
+	{
+	$output .= "<li><a href=\"dashboard.php\">Overview <span class=\"sr-only\">(current)</span></a></li>";
 	$output .= "</ul>";
 	
 	$output .=  "<ul class=\"nav nav-sidebar\">";
-	if($aadhar != "0" && $username !=null && $_SESSION["username"] != null)
+	$output .=  "<li><a href=\"index.php\">Home</a></li>";
+	if($block != 1)
 	{
 	$output .=  "<li><a href=\"postcomplaint.php\">Post Complaint</a></li>";
 	$output .=  "<li><a href=\"viewcomplaint.php\">View Complaints</a></li>";
+	}
 	}
 	if($username !=null || $_SESSION["username"] != null)
 	{
@@ -121,6 +133,8 @@ function sidebar($block,$aadhar,$username,$deptid)
 	$output .=   "<li><a href=\"help.php\">Help</a></li>";
 	$output .=   "</ul>";
 	
+	$output .=   "</div>";
+	$output .=   "</div>";
 	$output .=   "</div>";
 	  
 	return $output;
@@ -666,9 +680,9 @@ function update_field($update_column,$update_value, $ref_column, $ref_value, $ta
 		$ref_value = mysqli_real_escape_string($connection, $ref_value);
 		$update_value = mysqli_real_escape_string($connection, $update_value);
 		$query = "UPDATE `".$table_name."` SET `".$update_column."`=".$update_value." WHERE `".$ref_column."` = \"".$ref_value."\" LIMIT 1";
-		echo $query;
+		
 		$result = mysqli_query($connection, $query);
-		/*
+		
 		if($result && mysqli_affected_rows($connection) == 1)
 			{
 				$update_result = true;
@@ -690,5 +704,5 @@ function update_field($update_column,$update_value, $ref_column, $ref_value, $ta
 		
 		databaseconnectivity_close();
 		
-		return $update_result;*/
+		return $update_result;
 	}
